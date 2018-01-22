@@ -80,6 +80,15 @@ uint8_t waitForKey() {
   return c;
 }
 
+void initTextureScaleMap() {
+  uint8_t i = 1;
+  for(; i < SCREEN_HEIGHT; i++) {
+    textureScaleMap[i] = (uint16_t)(TEXTURE_SIZE_FIXED_PART / i);
+  }
+}
+
+  
+
 // sidesMap[y][x] contains a 8-bit mask DDCCBBAA, where
 // AA = 00 if northern side of wall is hidden,
 // BB = 00 if eastern side of wall is hidden,
@@ -187,8 +196,10 @@ uint8_t isWestVisible(uint8_t sidesMask) {
 void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side, uint8_t textureX) {
   uint16_t offset;
   uint16_t colorMapOffset;
+  uint16_t charOutAddr;
+  uint8_t* colorOutAddr;
 
-  uint16_t scale = (uint16_t)(TEXTURE_SIZE_FIXED_PART / (end-start));
+  uint16_t scale = textureScaleMap[end-start];
   uint8_t textureY = 0;
   uint16_t textureYFrac = 0;
   uint8_t y = 0;
@@ -196,27 +207,27 @@ void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side, uint8_t textur
   printf("\nvl: t=%u,u=%u,s=%u ", TEXTURE_SIZE_FIXED_PART, (end-start), scale);
 #endif   
   for (; y < SCREEN_HEIGHT; y++) {
-    offset = x + SCREEN_WIDTH * y; 
+    offset = x + SCREEN_WIDTH * y;
+    charOutAddr = backCharBufAddr + offset; 
+    colorOutAddr = &(backColorBuf[offset]);
     colorMapOffset = 0xd800 + offset;   
     if (y >= start && y < end) {
       textureY = (textureYFrac >> 10);
-      POKE(backCharBufAddr + offset, 160);
-      backColorBuf[offset] = (side == SIDE_HOR)
+      POKE(charOutAddr, 160);
+      POKE(colorOutAddr, (side == SIDE_HOR)
           ? textureBrick[textureX][textureY]
-          : textureBrick[textureX][textureY] + 8;
+          : textureBrick[textureX][textureY] + 8);
       //POKE(0xd800+offset, textureBrick[textureX][textureY]);
-      textureYFrac += scale;      
+      textureYFrac += scale;
 #ifdef DEBUG        
       printf("%u,%u,%u ", textureYFrac, textureX, textureY);
 #endif      
+    } else if (y >= end) {
+        POKE(charOutAddr, 160);
+        POKE(colorOutAddr, 9);  //POKE(colorMapOffset, 9);
     } else {
-      if (y >= end) {
-        POKE(backCharBufAddr + offset, 160);
-        backColorBuf[offset] = 9;  //POKE(colorMapOffset, 9);
-      } else {
-        POKE(backCharBufAddr + offset, 32);
-        backColorBuf[offset] = 0;  //POKE(colorMapOffset, 0);
-      }
+      POKE(charOutAddr, 32);
+      POKE(colorOutAddr, 0);  //POKE(colorMapOffset, 0);      
     }
   }  
 }
@@ -289,6 +300,8 @@ int main (void) {
   compileMapSides();
   printf("Init textures...\n");
   initTextures();
+  printf("Init texture scale map...\n");
+  initTextureScaleMap();
 #ifdef DEBUG
   for (x=0; x < 31; x++) {
     printf("%d ", textureBrick[2][x]);

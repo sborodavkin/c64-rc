@@ -24,6 +24,9 @@
 // Texture is stored in vertical stripes, i.e. [x][y].
 uint8_t textureBrick[TEXTURE_SIZE][TEXTURE_SIZE];
 
+// TEXTURE_SIZE_FIXED_PART divided by all possible values of line height (1..SCREEN_HEIGHT)
+uint16_t textureScaleMap[SCREEN_HEIGHT];
+
 // Visible and hidden sides of walls.
 uint8_t sidesMap[MAP_HEIGHT][MAP_WIDTH];
 
