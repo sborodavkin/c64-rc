@@ -11,11 +11,11 @@ uint8_t worldMap[MAP_HEIGHT][MAP_WIDTH]=
 {
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,1,1},
-  {1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,0,0,0,0,0,0,1},
-  {1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1},
-  {1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,0,1,1,1},
+  {1,0,0,0,0,0,1,1,1,0,2,2,2,0,2,2,2,0,2,2,2,2,2,2},
+  {1,0,0,0,0,0,1,1,1,1,2,0,0,0,0,0,2,0,0,0,0,0,0,2},
+  {1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
+  {1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,2,0,0,0,0,0,0,2},
+  {1,1,0,1,1,1,1,1,1,1,2,2,2,0,2,2,2,2,2,0,0,2,2,2},
   {1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
   {1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
   {1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -35,39 +35,33 @@ uint8_t worldMap[MAP_HEIGHT][MAP_WIDTH]=
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
-void initTexturesBrick() {
+
+void initTextures() {  
   uint8_t x, y, color;
-  for (y = 0; y < 32; y++) {
-    for (x = 0; x < 32; x++) {
-      color = 8;  // orange
-      if (y == 0 || y == 1 || y == 7 || y == 8 || y == 15 || y == 16 || y == 22 || y == 23 || y == 30 || y == 31) {
-        color = 12;  // grey 2
+  // Brick
+  for (y = 0; y < TEXTURE_SIZE; y++) {
+    for (x = 0; x < TEXTURE_SIZE; x++) {
+      color = 0;
+      if (x >= 10 && x < 22 && y > 10 && y < 20) {
+        color = 1;
       }
-      // Row 1
-      if (y >= 0 && y < 8 && (x == 5 || x == 6 || x == 18 || x == 19)) color = 12;
-      // Row 2
-      if (y >= 8 && y < 16 && (x == 9 || x == 10 || x == 25 || x == 26)) color = 12;
-      // Row 3
-      if (y >= 16 && y < 24 && (x == 17 || x == 18)) color = 12;
-      // Row 4
-      if (y >= 24 && y < 31 && (x == 11 || x == 12 || x == 21 || x == 22)) color = 12;
       textureBrick[x*TEXTURE_SIZE+y] = color;
+    }
+  }
+
+  // Square
+  for (y = 0; y < TEXTURE_SIZE; y++) {
+    for (x = 0; x < TEXTURE_SIZE; x++) {
+      color = 0;
+      if ((x >= 10 && x < 13 || x >= 20 && x < 22) || 
+        (y >= 10 && y < 13 || y >= 20 && y < 22)) {
+        color = 1;
+      }
+      textureSquare[x*TEXTURE_SIZE+y] = color;
     }
   }
 }
 
-void initTextures() {
-  uint8_t x, y, color;
-  for (y = 0; y < TEXTURE_SIZE; y++) {
-    for (x = 0; x < TEXTURE_SIZE; x++) {
-      color = 5;  // green
-      if (x >= 10 && x < 22 && y > 10 && y < 20) {
-        color = 12;
-      }
-      textureBrick[x*TEXTURE_SIZE+y] = color;
-    }
-  }
-}
 
 uint8_t waitForKey() {
   uint8_t c;
@@ -192,6 +186,25 @@ uint8_t isWestVisible(uint8_t sidesMask) {
 }
 */
 
+uint8_t getColor(uint8_t mapValue, uint8_t side, uint16_t numTextureCols, uint8_t textureY) {
+  uint8_t* texture;
+  uint8_t* colors;
+  uint8_t colorIndex;
+
+  if (mapValue == 1) {
+    texture = textureBrick;
+    colors = textureBrickColors;
+  } else if (mapValue == 2) {
+    texture = textureSquare;
+    colors = textureSquareColors;
+  }  
+  colorIndex = texture[numTextureCols+textureY];
+  if (side == SIDE_HOR) {
+    colorIndex += 2;
+  }
+  return colors[colorIndex];
+}
+
 void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side, uint8_t textureX, uint8_t mapValue) {
   uint16_t offset;
   uint16_t colorMapOffset;
@@ -217,9 +230,7 @@ void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side, uint8_t textur
     if (y >= start && y < end) {
       textureY = textureYFrac >> 10;
       POKE(charOutAddr, 160);
-      POKE(colorOutAddr, (side == SIDE_HOR)
-          ? textureBrick[numTextureCols+textureY]
-          : textureBrick[numTextureCols+textureY] + 8);
+      POKE(colorOutAddr, getColor(mapValue, side, numTextureCols, textureY));
       //POKE(0xd800+offset, textureBrick[textureX][textureY]);
       textureYFrac += scale;
 #ifdef DEBUG        

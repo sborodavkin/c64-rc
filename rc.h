@@ -21,6 +21,9 @@
 
 // Texture is stored in vertical stripes, i.e. [x][y].
 uint8_t textureBrick[TEXTURE_SIZE*TEXTURE_SIZE];
+uint8_t textureBrickColors[4] = {5, 12, 13, 15};
+uint8_t textureSquare[TEXTURE_SIZE*TEXTURE_SIZE];
+uint8_t textureSquareColors[4] = {2, 8, 10, 7};
 
 // TEXTURE_SIZE_FIXED_PART divided by all possible values of line height (1..SCREEN_HEIGHT)
 uint16_t textureScaleMap[SCREEN_HEIGHT];
