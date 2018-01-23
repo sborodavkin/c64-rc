@@ -192,7 +192,7 @@ uint8_t isWestVisible(uint8_t sidesMask) {
 }
 */
 
-void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side, uint8_t textureX) {
+void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side, uint8_t textureX, uint8_t mapValue) {
   uint16_t offset;
   uint16_t colorMapOffset;
   uint16_t charOutAddr;
@@ -300,6 +300,7 @@ int main (void) {
   uint16_t totalDist, correctDist;  
   uint8_t sidesMaskA, sidesMaskB;
   uint16_t newPosX, newPosY;  // Used for collision detection.
+  uint8_t mapValue;
   
   printf("\n");
   printf("***************************************\n");
@@ -450,7 +451,8 @@ int main (void) {
 
       //draw the pixels of the stripe as a vertical line     
 //#ifndef DEBUG      
-      verLine(x, drawStart, drawEnd, side, textureX);     
+      mapValue = worldMap[mapY][mapX];
+      verLine(x, drawStart, drawEnd, side, textureX, mapValue);
 //#else
 #ifdef DEBUG 
       printf("\n-cd=%d,lh=%d,ds=%d,de=%d,tx=%d", correctDist, lineHeight, drawStart, drawEnd, textureX);      

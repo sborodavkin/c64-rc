@@ -84,7 +84,7 @@ void compileMapSides();
 
 
 // Draws the vertical line to backBuffer and colorBuffer.
-void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t color, uint8_t textureX);
+void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side, uint8_t textureX, uint8_t mapValue);
 
 // Flushes back- and color-buffer to video RAM.
 void flushBuffer();
