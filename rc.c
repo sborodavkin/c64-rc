@@ -51,7 +51,7 @@ void initTexturesBrick() {
       if (y >= 16 && y < 24 && (x == 17 || x == 18)) color = 12;
       // Row 4
       if (y >= 24 && y < 31 && (x == 11 || x == 12 || x == 21 || x == 22)) color = 12;
-      textureBrick[x][y] = color;
+      textureBrick[x*TEXTURE_SIZE+y] = color;
     }
   }
 }
@@ -64,7 +64,7 @@ void initTextures() {
       if (x >= 10 && x < 22 && y > 10 && y < 20) {
         color = 12;
       }
-      textureBrick[x][y] = color;
+      textureBrick[x*TEXTURE_SIZE+y] = color;
     }
   }
 }
@@ -86,7 +86,6 @@ void initTextureScaleMap() {
     textureScaleMap[i] = (uint16_t)(TEXTURE_SIZE_FIXED_PART / i);
   }
 }
-
   
 
 // sidesMap[y][x] contains a 8-bit mask DDCCBBAA, where
@@ -198,11 +197,15 @@ void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side, uint8_t textur
   uint16_t colorMapOffset;
   uint16_t charOutAddr;
   uint8_t* colorOutAddr;
+  uint16_t numTextureCols;
 
-  uint16_t scale = textureScaleMap[end-start];
+  uint16_t scale;
   uint8_t textureY = 0;
   uint16_t textureYFrac = 0;
   uint8_t y = 0;
+  
+  scale = textureScaleMap[end-start];
+  numTextureCols = textureX * TEXTURE_SIZE;
 #ifdef DEBUG        
   printf("\nvl: t=%u,u=%u,s=%u ", TEXTURE_SIZE_FIXED_PART, (end-start), scale);
 #endif   
@@ -212,11 +215,11 @@ void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side, uint8_t textur
     colorOutAddr = &(backColorBuf[offset]);
     colorMapOffset = 0xd800 + offset;   
     if (y >= start && y < end) {
-      textureY = (textureYFrac >> 10);
+      textureY = textureYFrac >> 10;
       POKE(charOutAddr, 160);
       POKE(colorOutAddr, (side == SIDE_HOR)
-          ? textureBrick[textureX][textureY]
-          : textureBrick[textureX][textureY] + 8);
+          ? textureBrick[numTextureCols+textureY]
+          : textureBrick[numTextureCols+textureY] + 8);
       //POKE(0xd800+offset, textureBrick[textureX][textureY]);
       textureYFrac += scale;
 #ifdef DEBUG        
@@ -267,55 +270,59 @@ uint16_t distance(uint8_t angle, uint16_t ax, uint16_t ay, uint16_t bx, uint16_t
 
 
 int main (void) {
+  uint8_t pixToBrad; 
   // All angles are in brad, 0..255
   
   // Index of vertical stripe, in screen coordinates (0..SCREEN_WIDTH).
-  int x;
+  uint8_t x;
   // Global angle of ray direction.
-  int localAngle;
+  int8_t localAngle;
   uint8_t globalRayAngle;
   // Start global camera position.
-  int posX = 23 * 32 + 16 - 4, posY = 1 * 32 + 16;
+  int16_t posX = 23 * 32 + 16 - 4, posY = 1 * 32 + 16;
   // Start global camera direction.
-  int cameraAngle = 128, normalizedCameraAngle = 0;
+  uint8_t cameraAngle = 128;
   // Global position of current ray (=camera position).
-  int globalRayPosX, globalRayPosY;
+  int16_t globalRayPosX, globalRayPosY;
   // Global direction of current ray
   int8_t globalRayDirX, globalRayDirY;
   // Which box of the map we're in, in coordinates of worldMap.
-  int mapX, mapY;  
+  uint8_t mapX, mapY;  
   // Whether we have hit the wall, and from which side (0 = hor, 1 = vert)
   uint8_t side;
-  int lineHeight, drawStart, drawEnd, textureX;
+  uint8_t lineHeight, drawStart, drawEnd, textureX;
   // Input char
   char c;  
   // A is intersection with next horizontal line, B - with vertical line.
-  int /*xa, ya,*/ ax, ay, bx, by;
+  int16_t /*xa, ya,*/ ax, ay, bx, by;
   uint8_t axMap, ayMap, bxMap, byMap; // A and B in map coordinates.
-  int pa, pb, totalDist, correctDist;  
+  int16_t pa, pb;
+  uint16_t totalDist, correctDist;  
   uint8_t sidesMaskA, sidesMaskB;
   uint16_t newPosX, newPosY;  // Used for collision detection.
   
+  printf("\n");
+  printf("***************************************\n");
+  printf("* C64 RAYCASTER (C) S.BORODAVKIN 2018 *\n");
+  printf("***************************************\n\n");  
   printf("Compiling map sides...\n");
   compileMapSides();
   printf("Init textures...\n");
   initTextures();
   printf("Init texture scale map...\n");
   initTextureScaleMap();
-#ifdef DEBUG
-  for (x=0; x < 31; x++) {
-    printf("%d ", textureBrick[2][x]);
-  }
-  waitForKey();
-#endif  
-    
+  printf("Press a key...");
+  waitForKey();   
   
   // Switch to ALL CAPS (cc65 switches to lowercase in startup code).
-  POKE(0xd018, 0x15);
+  // POKE(0xd018, 0x15);
+  
+  
+  pixToBrad = FOV / SCREEN_WIDTH;
   
   for(;;) {
     for (x = 0; x < SCREEN_WIDTH; x++) {
-      localAngle = x * PIX_TO_BRAD - SCREEN_WIDTH / 2;
+      localAngle = x * pixToBrad - SCREEN_WIDTH / 2;
       globalRayAngle = normalizeAngle(cameraAngle - localAngle);
       globalRayDirX = COS[globalRayAngle]; 
       globalRayDirY = -SIN[globalRayAngle];  // Inverse as Y axis goes down.
@@ -436,9 +443,10 @@ int main (void) {
 
       //calculate lowest and highest pixel to fill in current stripe
       drawStart = (SCREEN_HEIGHT -lineHeight) >> 1;
-      if(drawStart < 0)drawStart = 0;
+      //if(drawStart < 0)drawStart = 0;
+      if (drawStart >= SCREEN_HEIGHT) drawStart = 0;
       drawEnd = (lineHeight + SCREEN_HEIGHT) >> 1;
-      if(drawEnd >= SCREEN_HEIGHT)drawEnd = SCREEN_HEIGHT - 1;
+      if(drawEnd >= SCREEN_HEIGHT) drawEnd = SCREEN_HEIGHT - 1;
 
       //draw the pixels of the stripe as a vertical line     
 //#ifndef DEBUG      
@@ -462,25 +470,24 @@ int main (void) {
     c = cbm_k_getin();
     if (c) {
       if (c == 'd') {    
-        cameraAngle -= 4;      
+        cameraAngle = normalizeAngle((int16_t)(cameraAngle - 4));
       } else if (c == 'a') {
-        cameraAngle += 4;
+        cameraAngle = normalizeAngle((int16_t)(cameraAngle + 4));
       } else if (c == 'w') {
-        newPosX = posX + (COS[normalizedCameraAngle] >> 3);
-        newPosY = posY + (-SIN[normalizedCameraAngle] >> 3);
+        newPosX = posX + (COS[cameraAngle] >> 3);
+        newPosY = posY + (-SIN[cameraAngle] >> 3);
         if (1) { //(worldMap[newPosY>>5][newPosX>>5] == 0) {
           posX = newPosX;
           posY = newPosY;
         }
       } else if (c == 's') {
-        newPosX = posX - (COS[normalizedCameraAngle] >> 3);
-        newPosY = posY - (-SIN[normalizedCameraAngle] >> 3);
+        newPosX = posX - (COS[cameraAngle] >> 3);
+        newPosY = posY - (-SIN[cameraAngle] >> 3);
         if (1) { //(worldMap[newPosY>>5][newPosX>>5] == 0) {
           posX = newPosX;
           posY = newPosY;
         }        
       }
-      normalizedCameraAngle = normalizeAngle(cameraAngle);
     }
 #endif    
   }

@@ -13,8 +13,6 @@
 // FOV: 42 = 60 degrees
 #define FOV 42
 
-#define PIX_TO_BRAD (FOV / SCREEN_WIDTH)
-
 #define SIDE_HOR 0
 #define SIDE_VER 1
 #define SIDE_UNDEF 2
@@ -22,7 +20,7 @@
 #define TOO_FAR 1024
 
 // Texture is stored in vertical stripes, i.e. [x][y].
-uint8_t textureBrick[TEXTURE_SIZE][TEXTURE_SIZE];
+uint8_t textureBrick[TEXTURE_SIZE*TEXTURE_SIZE];
 
 // TEXTURE_SIZE_FIXED_PART divided by all possible values of line height (1..SCREEN_HEIGHT)
 uint16_t textureScaleMap[SCREEN_HEIGHT];
@@ -83,10 +81,7 @@ uint8_t __fastcall__ (*cbm_k_clr)(void) = 0xe566;
 void initTextures();
 uint8_t waitForKey();
 void compileMapSides();
-uint8_t isNorthVisible(uint8_t sidesMask);
-uint8_t isSouthVisible(uint8_t sidesMask);
-uint8_t isEastVisible(uint8_t sidesMask);
-uint8_t isWestVisible(uint8_t sidesMask);
+
 
 // Draws the vertical line to backBuffer and colorBuffer.
 void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t color, uint8_t textureX);
