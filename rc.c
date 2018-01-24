@@ -348,14 +348,14 @@ int main (void) {
       mapY = globalRayPosY >> 5;
    
       if (globalRayDirY <= 0) {
-        ay = ((globalRayPosY >> 5) << 5) - 1;          
+        ay = (globalRayPosY & 0xFFE0) - 1;          
       } else {
-        ay = ((globalRayPosY >> 5) << 5) + 32;
+        ay = (globalRayPosY & 0xFFE0) + 32;
       }
       if (globalRayDirX <= 0) {
-        bx = ((globalRayPosX >> 5) << 5) - 1;
+        bx = (globalRayPosX & 0xFFE0) - 1;
       } else {
-        bx = ((globalRayPosX >> 5) << 5) + 32;
+        bx = (globalRayPosX & 0xFFE0) + 32;
       }
       ayMap = ay >> 5;
       bxMap = bx >> 5;      
@@ -367,12 +367,14 @@ int main (void) {
 #ifdef DEBUG
         printf("\n-grpx=%d,grpy=%d", globalRayPosX, globalRayPosY);
 #endif        
+        // Not using TAN here to keep higher precision:
+        // E.g. ((2<<5)*28/15)>>5=3; with TAN, ((2<<5)*1)>>5=2.
         ax = globalRayPosX + ((((globalRayPosY-ay) << 5) *
           globalRayDirX / -globalRayDirY) >> 5);        
         by = globalRayPosY + ((((globalRayPosX-bx) << 5) *
           -globalRayDirY / globalRayDirX) >> 5);
         axMap = ax >> 5;
-        byMap = by >> 5;     
+        byMap = by >> 5;
         pa = distance(globalRayAngle, globalRayPosX, globalRayPosY, ax, ay);
         pb = distance(globalRayAngle, globalRayPosX, globalRayPosY, bx, by);
         // Handle perpendiculars where overflow happens.
@@ -428,18 +430,18 @@ int main (void) {
 #endif        
         
         if (globalRayDirY <= 0) {
-          ay = ((globalRayPosY >> 5) << 5) - 1;
+          ay = (globalRayPosY & 0xFFE0) - 1;
           ayMap = ay >> 5;
         } else {
-          ay = ((globalRayPosY >> 5) << 5) + 32;
+          ay = (globalRayPosY & 0xFFE0) + 32;
           ayMap = ay >> 5;          
         }
         if (globalRayDirX <= 0) {
-          bx = ((globalRayPosX >> 5) << 5) - 1;
+          bx = (globalRayPosX & 0xFFE0) - 1;
           bxMap = bx >> 5;
           //xa = -xa;
         } else {
-          bx = ((globalRayPosX >> 5) << 5) + 32;
+          bx = (globalRayPosX & 0xFFE0) + 32;
           bxMap = bx >> 5;          
         }                
       }
