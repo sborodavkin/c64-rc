@@ -92,8 +92,5 @@ void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side, uint8_t textur
 // Flushes back- and color-buffer to video RAM.
 void flushBuffer();
 
-// Normalizes angle to 0..255 brad.
-uint8_t normalizeAngle(int angle);
-
 // Helper to calculate a distance between two points on a ray with given angle.
 uint16_t distance(uint8_t angle, uint16_t ax, uint16_t ay, uint16_t bx, uint16_t by);

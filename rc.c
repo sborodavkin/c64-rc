@@ -99,42 +99,17 @@ void compileMapSides() {
       sidesMask = 0xFF;
       if (y == 0 || worldMap[y-1][x] > 0) {
         sidesMask &= 0XFC;
-#ifdef DEBUG      
-        if (y == 16 && x == 7) {
-          printf("\n0xfc=%d", (int)sidesMask);
-        }
-#endif  
       }
       if (x == MAP_WIDTH - 1 || worldMap[y][x+1] > 0) {
         sidesMask &= 0xF3;
-#ifdef DEBUG      
-        if (y == 16 && x == 7) {
-          printf("\n0xf3=%d", (int)sidesMask);
-        }
-#endif        
       }
       if (y == MAP_HEIGHT - 1 || worldMap[y+1][x] > 0) {
         sidesMask &= 0xCF;
-#ifdef DEBUG      
-        if (y == 16 && x == 7) {
-          printf("\n0xcf=%d", (int)sidesMask);
-        }
-#endif
       }
       if (x == 0 || worldMap[y][x-1] > 0) {
         sidesMask &= 0x3F;
-#ifdef DEBUG      
-        if (y == 16 && x == 7) {
-          printf("\n0x3f=%d", (int)sidesMask);
-        }
-#endif                
       }
       sidesMap[y][x] = sidesMask;
-#ifdef DEBUG      
-      if (y == 16 && x == 7) {
-        printf("AAA %d", (int)sidesMap[y][x]);
-      }
-#endif      
     }
   }
 }
@@ -258,14 +233,18 @@ void flushBuffer() {
   memcpy((uint8_t *)0xd800, backColorBuf, 1000);  
 }
 
-uint8_t normalizeAngle(int16_t angle) {
+// Normalizes angle to 0..255 brad.
+// It works because a % b = a & (b-1) and casting to uint8_t
+// is same as adding 256 if a number was negative.
+// The original implementation was:
+/*uint8_t normalizeAngle(int16_t angle) {
   int16_t res = angle % 256;
   if (res < 0) {
     res += 256;
   }
   return (uint8_t)res;
-}    
-
+} */
+#define normalizeAngle(angle) ((uint8_t)(angle & 0xFF))
 
 // Helper to calculate a distance between two points on a ray with given angle.
 uint16_t distance(uint8_t angle, uint16_t ax, uint16_t ay, uint16_t bx, uint16_t by) {
@@ -293,6 +272,7 @@ int main (void) {
   int16_t posX = 23 * 32 + 16 - 4, posY = 1 * 32 + 16;
   // Start global camera direction.
   uint8_t cameraAngle = 128;
+  uint8_t halfScreenWidth = SCREEN_WIDTH / 2;
   // Global position of current ray (=camera position).
   int16_t globalRayPosX, globalRayPosY;
   // Global direction of current ray
@@ -334,7 +314,7 @@ int main (void) {
   
   for(;;) {
     for (x = 0; x < SCREEN_WIDTH; x++) {
-      localAngle = x * pixToBrad - SCREEN_WIDTH / 2;
+      localAngle = x * pixToBrad - halfScreenWidth;
       globalRayAngle = normalizeAngle(cameraAngle - localAngle);
       globalRayDirX = COS[globalRayAngle]; 
       globalRayDirY = -SIN[globalRayAngle];  // Inverse as Y axis goes down.
