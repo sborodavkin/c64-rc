@@ -293,6 +293,7 @@ int main (void) {
       if (globalRayDirY <= 0) {
         ay = (globalRayPosY & 0xFFF0) - 1;          
       } else {
+        //printf("\nololo grpxandfff0=%d,plus=%d\n", (globalRayPosY & 0xFFF0), (globalRayPosY & 0xFFF0) + MAP_UNIT_SIZE);
         ay = (globalRayPosY & 0xFFF0) + MAP_UNIT_SIZE;
       }
       if (globalRayDirX <= 0) {
@@ -323,7 +324,7 @@ int main (void) {
         // Handle perpendiculars where overflow happens.
         if (pa < 0) pa = TOO_FAR;
         if (pb < 0) pb = TOO_FAR;
-        if (abs(pa-pb) <= 3) {
+        if (abs(pa-pb) <= 5) {
           // Precision problem. Check actual sides visibility.
           sidesMaskA = sidesMap[ayMap][axMap];
           sidesMaskB = sidesMap[byMap][bxMap];
@@ -376,7 +377,7 @@ int main (void) {
           ay = (globalRayPosY & 0xFFF0) - 1;
           ayMap = ay >> MAP_UNIT_POWER;
         } else {
-          ay = (globalRayPosY & 0xFFF0) + 32;
+          ay = (globalRayPosY & 0xFFF0) + MAP_UNIT_SIZE;
           ayMap = ay >> MAP_UNIT_POWER;          
         }
         if (globalRayDirX <= 0) {
@@ -384,7 +385,7 @@ int main (void) {
           bxMap = bx >> MAP_UNIT_POWER;
           //xa = -xa;
         } else {
-          bx = (globalRayPosX & 0xFFF0) + 32;
+          bx = (globalRayPosX & 0xFFF0) + MAP_UNIT_SIZE;
           bxMap = bx >> MAP_UNIT_POWER;          
         }                
       }
