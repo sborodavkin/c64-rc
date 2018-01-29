@@ -42,8 +42,7 @@ void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side,
   uint16_t offset;
   uint8_t* charOutAddr;
   uint8_t* colorOutAddr;
-  // Here << 5 is same as * 32, and 32 is TEXTURE_SIZE.
-  uint16_t numTexelColsRendered = textureX << 5;
+  uint16_t numTexelColsRendered = textureX << TEXTURE_SIZE;
   uint8_t textureY = 0;
   uint16_t textureYFrac = 0;
   uint8_t y = 0;

@@ -21,8 +21,14 @@
 //#define DEBUG 0
 
 // Map dimensions in map coordinates.
-#define MAP_WIDTH 24
-#define MAP_HEIGHT 24
+#define MAP_WIDTH 16
+#define MAP_HEIGHT 16
+
+// Size of a map unit (i.e. how many player coordinates are in a map coord.)
+#define MAP_UNIT_SIZE 16
+// Power of 2 factor of MAP_UNIT_SIZE. If MAP_UNIT_SIZE changes to 32, this
+// should be changed to 5 and so on.
+#define MAP_UNIT_POWER 4
 
 // World map as 2D array. 0 is empty square, >0 are different wall types.
 extern uint8_t worldMap[][MAP_WIDTH];
@@ -39,12 +45,12 @@ extern uint8_t worldMap[][MAP_WIDTH];
 ////////////////////////////////////////////////////////////////////////////////
 
 // Texture resolution (width = height).
-#define TEXTURE_SIZE 32
+#define TEXTURE_SIZE MAP_UNIT_SIZE
 
 // For texture mapping we use fixed point calculation with 10 bits for the
-// fractional part. This is max value of the fixed part (=32) shifted left
+// fractional part. This is max value of the fixed part shifted left
 // by 10.
-#define TEXTURE_SIZE_FIXED_PART 32768u
+#define TEXTURE_SIZE_FIXED_PART 16384u
 
 // First texture. Textures are stored in vertical stripes, i.e.
 // [x*TEXTURE_SIZE+y] containing 0 for background color and 1 for foreground.

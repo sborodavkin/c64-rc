@@ -24,30 +24,22 @@
 
 uint8_t worldMap[MAP_HEIGHT][MAP_WIDTH] =
 {
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,1,1,1,0,2,2,2,0,2,2,2,0,2,2,2,2,2,2},
-  {1,0,0,0,0,0,1,1,1,1,2,0,0,0,0,0,2,0,0,0,0,0,0,2},
-  {1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
-  {1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,2,0,0,0,0,0,0,2},
-  {1,1,0,1,1,1,1,1,1,1,2,2,2,0,2,2,2,2,2,0,0,2,2,2},
-  {1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1},
-  {1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1},
-  {1,1,1,1,1,1,1,0,1,0,0,0,0,1,0,0,0,0,0,0,1,0,1,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1},
-  {1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1},
-  {1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,1},
-  {1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,1},
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,2,2,2,0,2,2,2,0,2,2,2,2,2,2},
+  {1,1,2,0,0,0,0,0,2,0,0,0,0,0,0,2},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
+  {1,0,2,0,0,0,0,0,2,0,0,0,0,0,0,2},
+  {1,1,2,2,2,0,2,2,2,2,2,0,0,2,2,2},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
 uint8_t textureBrick[TEXTURE_SIZE*TEXTURE_SIZE];
@@ -103,7 +95,7 @@ void initTextures() {
   for (y = 0; y < TEXTURE_SIZE; y++) {
     for (x = 0; x < TEXTURE_SIZE; x++) {
       color = 0;
-      if (x >= 10 && x < 22 && y > 10 && y < 20) {
+      if (x >= 5 && x < 11 && y > 5 && y < 10) {
         color = 1;
       }
       textureBrick[x*TEXTURE_SIZE+y] = color;
@@ -114,8 +106,8 @@ void initTextures() {
   for (y = 0; y < TEXTURE_SIZE; y++) {
     for (x = 0; x < TEXTURE_SIZE; x++) {
       color = 0;
-      if ((x >= 10 && x < 13 || x >= 20 && x < 22) || 
-        (y >= 10 && y < 13 || y >= 20 && y < 22)) {
+      if ((x >= 5 && x < 7 || x >= 10 && x < 12) || 
+        (y >= 5 && y < 7 || y >= 10 && y < 12)) {
         color = 1;
       }
       textureSquare[x*TEXTURE_SIZE+y] = color;
@@ -221,10 +213,10 @@ uint16_t distance(uint8_t angle, uint16_t ax, uint16_t ay, uint16_t bx, uint16_t
   uint16_t distX = abs(ax-bx), distY = abs(ay-by);
   if (distX > distY) {
     // X is more distinct, use cos.v
-    return (distX << 5) / abs(COS[angle]);
+    return (distX << MAP_UNIT_POWER) / abs(COS[angle]);
   } else {
     // Y is more distinct, use sin.
-    return (distY << 5) / abs(SIN[angle]);
+    return (distY << MAP_UNIT_POWER) / abs(SIN[angle]);
   }
 }
 
@@ -239,7 +231,8 @@ int main (void) {
   int8_t localAngle;
   uint8_t globalRayAngle;
   // Start global camera position.
-  int16_t posX = 23 * 32 + 16 - 4, posY = 1 * 32 + 16;
+  int16_t posX = 14 * MAP_UNIT_SIZE + MAP_UNIT_SIZE/2,
+          posY = 1 * MAP_UNIT_SIZE + MAP_UNIT_SIZE/2;
   // Start global camera direction.
   uint8_t cameraAngle = 128;
   uint8_t halfScreenWidth = SCREEN_WIDTH / 2;
@@ -294,21 +287,21 @@ int main (void) {
         printf("\ntracing ray %d: a=%d,gx=%d,gy=%d", x, globalRayAngle,globalRayDirX,globalRayDirY);
 #endif      
       //which box of the map we're in
-      mapX = globalRayPosX >> 5;
-      mapY = globalRayPosY >> 5;
+      mapX = globalRayPosX >> MAP_UNIT_POWER;
+      mapY = globalRayPosY >> MAP_UNIT_POWER;
    
       if (globalRayDirY <= 0) {
-        ay = (globalRayPosY & 0xFFE0) - 1;          
+        ay = (globalRayPosY & 0xFFF0) - 1;          
       } else {
-        ay = (globalRayPosY & 0xFFE0) + 32;
+        ay = (globalRayPosY & 0xFFF0) + MAP_UNIT_SIZE;
       }
       if (globalRayDirX <= 0) {
-        bx = (globalRayPosX & 0xFFE0) - 1;
+        bx = (globalRayPosX & 0xFFF0) - 1;
       } else {
-        bx = (globalRayPosX & 0xFFE0) + 32;
+        bx = (globalRayPosX & 0xFFF0) + MAP_UNIT_SIZE;
       }
-      ayMap = ay >> 5;
-      bxMap = bx >> 5;      
+      ayMap = ay >> MAP_UNIT_POWER;
+      bxMap = bx >> MAP_UNIT_POWER;      
       side = SIDE_UNDEF;
       totalDist = 0;
 
@@ -319,18 +312,18 @@ int main (void) {
 #endif        
         // Not using TAN here to keep higher precision:
         // E.g. ((2<<5)*28/15)>>5=3; with TAN, ((2<<5)*1)>>5=2.
-        ax = globalRayPosX + ((((globalRayPosY-ay) << 5) *
-          globalRayDirX / -globalRayDirY) >> 5);        
-        by = globalRayPosY + ((((globalRayPosX-bx) << 5) *
-          -globalRayDirY / globalRayDirX) >> 5);
-        axMap = ax >> 5;
-        byMap = by >> 5;
+        ax = globalRayPosX + ((((globalRayPosY-ay) << MAP_UNIT_POWER) *
+          globalRayDirX / -globalRayDirY) >> MAP_UNIT_POWER);        
+        by = globalRayPosY + ((((globalRayPosX-bx) << MAP_UNIT_POWER) *
+          -globalRayDirY / globalRayDirX) >> MAP_UNIT_POWER);
+        axMap = ax >> MAP_UNIT_POWER;
+        byMap = by >> MAP_UNIT_POWER;
         pa = distance(globalRayAngle, globalRayPosX, globalRayPosY, ax, ay);
         pb = distance(globalRayAngle, globalRayPosX, globalRayPosY, bx, by);
         // Handle perpendiculars where overflow happens.
         if (pa < 0) pa = TOO_FAR;
         if (pb < 0) pb = TOO_FAR;
-        if (abs(pa-pb) <= 5) {   // With 4 errors still exist.
+        if (abs(pa-pb) <= 3) {
           // Precision problem. Check actual sides visibility.
           sidesMaskA = sidesMap[ayMap][axMap];
           sidesMaskB = sidesMap[byMap][bxMap];
@@ -362,7 +355,7 @@ int main (void) {
           globalRayPosX = ax;
           globalRayPosY = ay;
           totalDist += pa;
-          textureX = ax % 32;
+          textureX = ax % TEXTURE_SIZE;
         } else {
           if (worldMap[byMap][bxMap] > 0) {  
             side = SIDE_VER;
@@ -372,7 +365,7 @@ int main (void) {
           globalRayPosX = bx;
           globalRayPosY = by;
           totalDist += pb;
-          textureX = by % 32;
+          textureX = by % TEXTURE_SIZE;
         }
         
 #ifdef DEBUG        
@@ -380,30 +373,30 @@ int main (void) {
 #endif        
         
         if (globalRayDirY <= 0) {
-          ay = (globalRayPosY & 0xFFE0) - 1;
-          ayMap = ay >> 5;
+          ay = (globalRayPosY & 0xFFF0) - 1;
+          ayMap = ay >> MAP_UNIT_POWER;
         } else {
-          ay = (globalRayPosY & 0xFFE0) + 32;
-          ayMap = ay >> 5;          
+          ay = (globalRayPosY & 0xFFF0) + 32;
+          ayMap = ay >> MAP_UNIT_POWER;          
         }
         if (globalRayDirX <= 0) {
-          bx = (globalRayPosX & 0xFFE0) - 1;
-          bxMap = bx >> 5;
+          bx = (globalRayPosX & 0xFFF0) - 1;
+          bxMap = bx >> MAP_UNIT_POWER;
           //xa = -xa;
         } else {
-          bx = (globalRayPosX & 0xFFE0) + 32;
-          bxMap = bx >> 5;          
+          bx = (globalRayPosX & 0xFFF0) + 32;
+          bxMap = bx >> MAP_UNIT_POWER;          
         }                
       }
 #ifdef DEBUG
       printf("\n*mx=%d,my=%d,s=%d,td=%d", mapX, mapY, side, totalDist);
 #endif      
-      correctDist = (totalDist * COS[normalizeAngle(localAngle)]) >> 5;
+      correctDist = (totalDist * COS[normalizeAngle(localAngle)]) >> MAP_UNIT_POWER;
       
       
 
       //Calculate height of line to draw on screen
-      lineHeight = 32*35 / correctDist;
+      lineHeight = MAP_UNIT_SIZE*35 / correctDist;
 
       //calculate lowest and highest pixel to fill in current stripe
       drawStart = (SCREEN_HEIGHT -lineHeight) >> 1;
@@ -439,15 +432,15 @@ int main (void) {
       } else if (c == 'a') {
         cameraAngle = normalizeAngle((int16_t)(cameraAngle + 4));
       } else if (c == 'w') {
-        newPosX = posX + (COS[cameraAngle] >> 3);
-        newPosY = posY + (-SIN[cameraAngle] >> 3);
+        newPosX = posX + (COS[cameraAngle] >> 4);
+        newPosY = posY + (-SIN[cameraAngle] >> 4);
         if (1) { //(worldMap[newPosY>>5][newPosX>>5] == 0) {
           posX = newPosX;
           posY = newPosY;
         }
       } else if (c == 's') {
-        newPosX = posX - (COS[cameraAngle] >> 3);
-        newPosY = posY - (-SIN[cameraAngle] >> 3);
+        newPosX = posX - (COS[cameraAngle] >> 4);
+        newPosY = posY - (-SIN[cameraAngle] >> 4);
         if (1) { //(worldMap[newPosY>>5][newPosX>>5] == 0) {
           posX = newPosX;
           posY = newPosY;
