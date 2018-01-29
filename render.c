@@ -42,11 +42,10 @@ void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side,
   uint16_t offset;
   uint8_t* charOutAddr;
   uint8_t* colorOutAddr;
-  uint16_t numTexelColsRendered = textureX << TEXTURE_SIZE;
+  uint16_t numTexelColsRendered = textureX << MAP_UNIT_POWER;
   uint8_t textureY = 0;
   uint16_t textureYFrac = 0;
   uint8_t y = 0;
-  
   while (y < SCREEN_HEIGHT) {
     offset = x + (y<<5) + (y<<3);  // Presumably faster than y*40.
     charOutAddr = (uint8_t*)(backCharBufAddr + offset);
