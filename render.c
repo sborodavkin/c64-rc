@@ -8,7 +8,9 @@
 /*                                                                            */
 /******************************************************************************/
 
+#include <peekpoke.h>
 #include <stdint.h>
+#include <string.h>
 #include "raycaster.h"
 #include "render.h"
 
@@ -46,7 +48,7 @@ void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side,
   uint16_t textureYFrac = 0;
   uint8_t y = 0;
   
-  while (y < SCREEN_HEIGHT) {    
+  while (y < SCREEN_HEIGHT) {
     offset = x + (y<<5) + (y<<3);  // Presumably faster than y*40.
     charOutAddr = (uint8_t*)(backCharBufAddr + offset);
     colorOutAddr = (uint8_t*)(backColorBufAddr + offset);
@@ -64,7 +66,7 @@ void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side,
       *(unsigned char*)(colorOutAddr) = (unsigned char)0;
     }
     y++;
-  }  
+  }
 }
 
 // Flushes back- and color-buffer to video RAM.

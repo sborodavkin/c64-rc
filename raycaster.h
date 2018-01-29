@@ -113,7 +113,7 @@ extern int8_t SIN[];
 ////////////////////////////////////////////////////////////////////////////////
 
 // KERNAL function GETIN - get a character from default input device.
-uint8_t __fastcall__ (*cbm_k_getin)(void) = 0xFFE4;
+extern uint8_t __fastcall__ (*cbm_k_getin)(void);
 
 // Waits for a keypress and returns the char.
 uint8_t waitForKey();

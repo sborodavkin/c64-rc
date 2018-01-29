@@ -15,8 +15,8 @@
 // Character buffers. Every i-th frame is rendered to CHAR_BUF_0,
 // (i+1)-th frame is rendered to CHAR_BUF_1, (i+2)-th - to CHAR_BUF_0 again
 // and so on.
-#define CHAR_BUF_0 0x400;
-#define CHAR_BUF_1 0x800;
+#define CHAR_BUF_0 0x400
+#define CHAR_BUF_1 0x800
 
 // Back char buffer index - 0 or 1.
 extern uint16_t backCharBufAddr;
