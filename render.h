@@ -35,7 +35,7 @@ extern uint16_t backCharBufAddr;
  *   backColorBufAddr: color RAM back buffer address.
  */ 
 extern void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side,
-                    uint8_t textureX, uint16_t scale, uint8_t mapValue,
+                    uint8_t textureX, uint8_t scale, uint8_t mapValue,
                     uint16_t backCharBufAddr, uint16_t backColorBufAddr);
 
 /* Gets color of a specific Y-offset of a wall slice.
@@ -55,7 +55,7 @@ extern void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side,
  *             it is 3).
  */               
 extern uint8_t getColor(uint8_t mapValue, uint8_t side,
-                        uint16_t numTexelColsRendered, uint8_t textureY);
+                        uint8_t numTexelColsRendered, uint8_t textureY);
                         
 /* Makes back char buffer visible and copies the back color buffer to color RAM.
  */

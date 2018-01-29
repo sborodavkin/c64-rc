@@ -47,10 +47,10 @@ extern uint8_t worldMap[][MAP_WIDTH];
 // Texture resolution (width = height).
 #define TEXTURE_SIZE MAP_UNIT_SIZE
 
-// For texture mapping we use fixed point calculation with 10 bits for the
+// For texture mapping we use fixed point calculation with 4 bits for the
 // fractional part. This is max value of the fixed part shifted left
-// by 10.
-#define TEXTURE_SIZE_FIXED_PART 16384u
+// by 4.
+#define TEXTURE_SIZE_FIXED_PART 0xF0
 
 // First texture. Textures are stored in vertical stripes, i.e.
 // [x*TEXTURE_SIZE+y] containing 0 for background color and 1 for foreground.
@@ -64,7 +64,7 @@ extern uint8_t textureSquareColors[];
 
 // TEXTURE_SIZE_FIXED_PART divided by all possible values of line height
 // (1..SCREEN_HEIGHT)
-extern uint16_t textureScaleMap[];
+extern uint8_t textureScaleMap[];
 
 ////////////////////////////////////////////////////////////////////////////////
 // Wall sides operations.

@@ -46,7 +46,7 @@ uint8_t textureBrick[TEXTURE_SIZE*TEXTURE_SIZE];
 uint8_t textureBrickColors[4] = {5, 12, 13, 15};
 uint8_t textureSquare[TEXTURE_SIZE*TEXTURE_SIZE];
 uint8_t textureSquareColors[4] = {2, 8, 10, 7};
-uint16_t textureScaleMap[SCREEN_HEIGHT];
+uint8_t textureScaleMap[SCREEN_HEIGHT];
 uint8_t sidesMap[MAP_HEIGHT][MAP_WIDTH];
 uint8_t backColorBuf[1000];
 int8_t COS[NUM_ANGLES] = {32, 32, 32, 32, 32, 32, 32, 32, 31, 31, 31, 31, 31,
@@ -118,7 +118,7 @@ void initTextures() {
 void initTextureScaleMap() {
   uint8_t i = 1;
   for(; i < SCREEN_HEIGHT; i++) {
-    textureScaleMap[i] = (uint16_t)(TEXTURE_SIZE_FIXED_PART / i);
+    textureScaleMap[i] = (uint8_t)(TEXTURE_SIZE_FIXED_PART / i);
   }
 }
 
