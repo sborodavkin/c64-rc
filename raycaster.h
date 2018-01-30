@@ -40,6 +40,9 @@ extern uint8_t worldMap[][MAP_WIDTH];
 // Field of view in brad (0-255). 42 corresponds to 60 degrees.
 #define FOV 42
 
+// String buffer to print info line.
+extern char infoStrBuf[];
+
 ////////////////////////////////////////////////////////////////////////////////
 // Textures.
 ////////////////////////////////////////////////////////////////////////////////
@@ -108,10 +111,10 @@ extern uint8_t backColorBuf[];
 
 #define NUM_ANGLES 256
 
-// Cos table, 0-255 => -32..32
+// Cos table, 0-255 => -16..16
 extern int8_t COS[];
   
-// Sin table, 0-255 => -32..32
+// Sin table, 0-255 => -16..16
 extern int8_t SIN[];
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -134,7 +137,18 @@ void compileMapSides();
 void flushBuffer();
 
 // Helper to calculate a distance between two points on a ray with given angle.
-uint16_t distance(uint8_t angle, uint16_t ax, uint16_t ay,
-                  uint16_t bx, uint16_t by);
+uint8_t distance(uint8_t absCos, uint8_t absSin, uint8_t ax, uint8_t ay,
+                 uint8_t bx, uint8_t by);
+
+/* Prints the info line.
+ *
+ * Args:
+ *   posX: global x-position of player.
+ *   posY: global y-position of player.
+ *   angle: global camera angle.
+ *   clkFps: clock_t ticks per frame.
+ */
+extern void printInfo(uint8_t posX, uint8_t posY, uint8_t angle,
+                      uint16_t clkFps);
 
 #endif

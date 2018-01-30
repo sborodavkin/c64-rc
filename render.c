@@ -10,6 +10,7 @@
 
 #include <peekpoke.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include "raycaster.h"
 #include "render.h"

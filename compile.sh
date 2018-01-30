@@ -1,7 +1,7 @@
 cc65 -Oirs -T render.c
 ca65 render.s
 
-cc65 -t c64 raycaster.c
+cc65 -t c64 -T raycaster.c
 ca65 raycaster.s
 
 ld65 -t c64 -o rc raycaster.o render.o c64.lib
