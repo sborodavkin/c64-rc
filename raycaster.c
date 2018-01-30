@@ -224,6 +224,171 @@ void printInfo(uint8_t posX, uint8_t posY, uint8_t angle, uint16_t clkFps) {
   }
 }
 
+void castRay(uint8_t globalRayAngle, uint8_t* distance, uint8_t* side, uint8_t* mapValue, uint8_t* textureX) {
+  // Start global camera position.
+  uint8_t posX = 14 * MAP_UNIT_SIZE + MAP_UNIT_SIZE/2,
+          posY = 1 * MAP_UNIT_SIZE + MAP_UNIT_SIZE/2;
+  // Global position of current ray (=camera position).
+  uint8_t globalRayPosX, globalRayPosY;          
+  // Global direction of current ray
+  int8_t globalRayDirX, globalRayDirY;
+  uint8_t absCos, absSin;
+
+  globalRayDirX = COS[globalRayAngle]; 
+  globalRayDirY = -SIN[globalRayAngle];  // Inverse as Y axis goes down.
+  absCos = abs(globalRayDirX);
+  absSin = abs(globalRayDirY);
+  globalRayPosX = posX;
+  globalRayPosY = posY;
+#ifdef DEBUG      
+    printf("\ntracing ray %d: a=%d,gx=%d,gy=%d", x, globalRayAngle,globalRayDirX,globalRayDirY);
+#endif      
+  //which box of the map we're in
+  mapX = globalRayPosX >> MAP_UNIT_POWER;
+  mapY = globalRayPosY >> MAP_UNIT_POWER;
+
+  if (globalRayDirY <= 0) {
+    ay = (globalRayPosY & 0xF0) - 1;
+  } else {
+    ay = (globalRayPosY & 0xF0) + MAP_UNIT_SIZE;
+  }
+  if (globalRayDirX <= 0) {
+    bx = (globalRayPosX & 0xF0) - 1;
+  } else {
+    bx = (globalRayPosX & 0xF0) + MAP_UNIT_SIZE;
+  }
+  ayMap = ay >> MAP_UNIT_POWER;
+  bxMap = bx >> MAP_UNIT_POWER;      
+  *side = SIDE_UNDEF;
+  totalDist = 0;
+
+  // Start DDA.
+  while (*side == SIDE_UNDEF) {
+    pb = 0; pa = 0;      
+#ifdef DEBUG
+    printf("\n-grpx=%d,grpy=%d", globalRayPosX, globalRayPosY);
+#endif        
+    if (absCos == 16 && absSin == 1) {
+      // (Nearly) horizontal ray, won't cross any SIDE_HOR.
+      ax = TOO_FAR;
+      pa = TOO_FAR;
+    } else {          
+      ax = DIFF(globalRayPosY, ay) * absCos / absSin;
+      if (globalRayDirX > 0) {
+        if (globalRayPosX + ax > UINT8_MAX) {  // Uint8_t overflow.
+          ax = TOO_FAR;
+          pa = TOO_FAR;
+        } else {          
+          ax = globalRayPosX + ax;
+        }
+      } else {
+        if (ax > globalRayPosX) {
+          ax = TOO_FAR;
+          pa = TOO_FAR;
+        } else {
+          ax = globalRayPosX - ax;
+        }
+      }
+      axMap = ax >> MAP_UNIT_POWER;
+    }
+    if (absSin == 16 && absCos == 1) {
+      // (Nearly) vertical ray, won't cross any SIDE_VER.
+      by = TOO_FAR;
+      pb = TOO_FAR;
+    } else {          
+      by = DIFF(globalRayPosX, bx) * absSin / absCos;
+      if (globalRayDirY > 0) {
+        if (globalRayPosY + by > UINT8_MAX) {  // Uint8_t overflow.
+          by = TOO_FAR;
+          pb = TOO_FAR;
+        } else {
+          by = globalRayPosY + by;
+        }
+      } else {
+        if (by > globalRayPosY) {
+          by = TOO_FAR;
+          pb = TOO_FAR;
+        } else {
+          by = globalRayPosY - by;
+        }
+      }
+      byMap = by >> MAP_UNIT_POWER;       
+    }        
+    if (!pa) pa = distance(absCos, absSin, globalRayPosX, globalRayPosY, ax, ay);
+    if (!pb) pb = distance(absCos, absSin, globalRayPosX, globalRayPosY, bx, by);
+    // Handle perpendiculars where overflow happens.
+    if (abs(pa-pb) <= 5) {
+      // Precision problem. Check actual sides visibility.
+      sidesMaskA = sidesMap[ayMap][axMap];
+      sidesMaskB = sidesMap[byMap][bxMap];
+#ifdef DEBUG
+      printf("\n-sma:%d,smb:%d", sidesMaskA, sidesMaskB);
+#endif          
+      if (globalRayDirY < 0 && !isSouthVisible(sidesMaskA)) {
+        pa = TOO_FAR;
+      } else if (globalRayDirY > 0 && !isNorthVisible(sidesMaskA)) {
+        pa = TOO_FAR;
+      } else {  // if (pa < TOO_FAR)
+        if (globalRayDirX < 0 && !isEastVisible(sidesMaskB)) {
+          pb = TOO_FAR;
+        } else if (globalRayDirX > 0 && !isWestVisible(sidesMaskB)) {
+          pb = TOO_FAR;
+        }
+      }
+    }        
+#ifdef DEBUG
+      printf("\n-ax:%d,ay:%d,bx:%d,by:%d", ax, ay, bx, by);
+      printf("\n-pa:%d,pb:%d", pa, pb);
+#endif
+    if (pa < pb) {
+      if (worldMap[ayMap][axMap] > 0) {  
+        *side = SIDE_HOR;
+        mapX = axMap;
+        mapY = ayMap;            
+      }
+      globalRayPosX = ax;
+      globalRayPosY = ay;
+      totalDist += pa;
+      *textureX = ax % TEXTURE_SIZE;
+    } else {
+      if (worldMap[byMap][bxMap] > 0) {  
+        *side = SIDE_VER;
+        mapX = bxMap;
+        mapY = byMap;
+      }
+      globalRayPosX = bx;
+      globalRayPosY = by;
+      totalDist += pb;
+      *textureX = by % TEXTURE_SIZE;
+    }
+    
+#ifdef DEBUG        
+    printf("\n-td=%d", totalDist);
+#endif        
+    
+    if (globalRayDirY <= 0) {
+      ay = (globalRayPosY & 0xF0) - 1;
+      ayMap = ay >> MAP_UNIT_POWER;
+    } else {
+      ay = (globalRayPosY & 0xF0) + MAP_UNIT_SIZE;
+      ayMap = ay >> MAP_UNIT_POWER;          
+    }
+    if (globalRayDirX <= 0) {
+      bx = (globalRayPosX & 0xF0) - 1;
+      bxMap = bx >> MAP_UNIT_POWER;
+      //xa = -xa;
+    } else {
+      bx = (globalRayPosX & 0xF0) + MAP_UNIT_SIZE;
+      bxMap = bx >> MAP_UNIT_POWER;          
+    }                
+  }
+#ifdef DEBUG
+  printf("\n*mx=%d,my=%d,s=%d,td=%d", mapX, mapY, side, totalDist);
+#endif      
+  *distance = (totalDist * COS[localAngle]) >> MAP_UNIT_POWER;
+  *mapValue = worldMap[mapY][mapX];
+}
+
 int main (void) {
   uint8_t pixToBrad; 
   // All angles are in brad, 0..255
@@ -233,16 +398,10 @@ int main (void) {
   // Global angle of ray direction.
   int8_t localAngle;
   uint8_t globalRayAngle;
-  // Start global camera position.
-  uint8_t posX = 14 * MAP_UNIT_SIZE + MAP_UNIT_SIZE/2,
-          posY = 1 * MAP_UNIT_SIZE + MAP_UNIT_SIZE/2;
   // Start global camera direction.
   uint8_t cameraAngle = 127;
   uint8_t halfScreenWidth = SCREEN_WIDTH / 2;
-  // Global position of current ray (=camera position).
-  uint8_t globalRayPosX, globalRayPosY;
-  // Global direction of current ray
-  int8_t globalRayDirX, globalRayDirY;
+
   // Which box of the map we're in, in coordinates of worldMap.
   uint8_t mapX, mapY;  
   // Whether we have hit the wall, and from which side (0 = hor, 1 = vert)
@@ -258,7 +417,6 @@ int main (void) {
   uint8_t sidesMaskA, sidesMaskB;
   uint8_t newPosX, newPosY;  // Used for collision detection.
   uint8_t mapValue;
-  uint8_t absCos, absSin;
   clock_t fpsStart, fpsEnd;
   
   printf("\n");
@@ -285,160 +443,8 @@ int main (void) {
     for (x = 0; x < SCREEN_WIDTH; x++) {
       localAngle = x * pixToBrad - halfScreenWidth;
       globalRayAngle = cameraAngle - localAngle;
-      globalRayDirX = COS[globalRayAngle]; 
-      globalRayDirY = -SIN[globalRayAngle];  // Inverse as Y axis goes down.
-      absCos = abs(globalRayDirX);
-      absSin = abs(globalRayDirY);
-      globalRayPosX = posX;
-      globalRayPosY = posY;
-#ifdef DEBUG      
-        printf("\ntracing ray %d: a=%d,gx=%d,gy=%d", x, globalRayAngle,globalRayDirX,globalRayDirY);
-#endif      
-      //which box of the map we're in
-      mapX = globalRayPosX >> MAP_UNIT_POWER;
-      mapY = globalRayPosY >> MAP_UNIT_POWER;
-   
-      if (globalRayDirY <= 0) {
-        ay = (globalRayPosY & 0xF0) - 1;
-      } else {
-        ay = (globalRayPosY & 0xF0) + MAP_UNIT_SIZE;
-      }
-      if (globalRayDirX <= 0) {
-        bx = (globalRayPosX & 0xF0) - 1;
-      } else {
-        bx = (globalRayPosX & 0xF0) + MAP_UNIT_SIZE;
-      }
-      ayMap = ay >> MAP_UNIT_POWER;
-      bxMap = bx >> MAP_UNIT_POWER;      
-      side = SIDE_UNDEF;
-      totalDist = 0;
-
-      // Start DDA.
-      while (side == SIDE_UNDEF) {
-        pb = 0; pa = 0;      
-#ifdef DEBUG
-        printf("\n-grpx=%d,grpy=%d", globalRayPosX, globalRayPosY);
-#endif        
-        if (absCos == 16 && absSin == 1) {
-          // (Nearly) horizontal ray, won't cross any SIDE_HOR.
-          ax = TOO_FAR;
-          pa = TOO_FAR;
-        } else {          
-          ax = DIFF(globalRayPosY, ay) * absCos / absSin;
-          if (globalRayDirX > 0) {
-            if (globalRayPosX + ax > UINT8_MAX) {  // Uint8_t overflow.
-              ax = TOO_FAR;
-              pa = TOO_FAR;
-            } else {          
-              ax = globalRayPosX + ax;
-            }
-          } else {
-            if (ax > globalRayPosX) {
-              ax = TOO_FAR;
-              pa = TOO_FAR;
-            } else {
-              ax = globalRayPosX - ax;
-            }
-          }
-          axMap = ax >> MAP_UNIT_POWER;
-        }
-        if (absSin == 16 && absCos == 1) {
-          // (Nearly) vertical ray, won't cross any SIDE_VER.
-          by = TOO_FAR;
-          pb = TOO_FAR;
-        } else {          
-          by = DIFF(globalRayPosX, bx) * absSin / absCos;
-          if (globalRayDirY > 0) {
-            if (globalRayPosY + by > UINT8_MAX) {  // Uint8_t overflow.
-              by = TOO_FAR;
-              pb = TOO_FAR;
-            } else {
-              by = globalRayPosY + by;
-            }
-          } else {
-            if (by > globalRayPosY) {
-              by = TOO_FAR;
-              pb = TOO_FAR;
-            } else {
-              by = globalRayPosY - by;
-            }
-          }
-          byMap = by >> MAP_UNIT_POWER;       
-        }        
-        if (!pa) pa = distance(absCos, absSin, globalRayPosX, globalRayPosY, ax, ay);
-        if (!pb) pb = distance(absCos, absSin, globalRayPosX, globalRayPosY, bx, by);
-        // Handle perpendiculars where overflow happens.
-        if (abs(pa-pb) <= 5) {
-          // Precision problem. Check actual sides visibility.
-          sidesMaskA = sidesMap[ayMap][axMap];
-          sidesMaskB = sidesMap[byMap][bxMap];
-#ifdef DEBUG
-          printf("\n-sma:%d,smb:%d", sidesMaskA, sidesMaskB);
-#endif          
-          if (globalRayDirY < 0 && !isSouthVisible(sidesMaskA)) {
-            pa = TOO_FAR;
-          } else if (globalRayDirY > 0 && !isNorthVisible(sidesMaskA)) {
-            pa = TOO_FAR;
-          } else {  // if (pa < TOO_FAR)
-            if (globalRayDirX < 0 && !isEastVisible(sidesMaskB)) {
-              pb = TOO_FAR;
-            } else if (globalRayDirX > 0 && !isWestVisible(sidesMaskB)) {
-              pb = TOO_FAR;
-            }
-          }
-        }        
-#ifdef DEBUG
-          printf("\n-ax:%d,ay:%d,bx:%d,by:%d", ax, ay, bx, by);
-          printf("\n-pa:%d,pb:%d", pa, pb);
-#endif
-        if (pa < pb) {
-          if (worldMap[ayMap][axMap] > 0) {  
-            side = SIDE_HOR;
-            mapX = axMap;
-            mapY = ayMap;            
-          }
-          globalRayPosX = ax;
-          globalRayPosY = ay;
-          totalDist += pa;
-          textureX = ax % TEXTURE_SIZE;
-        } else {
-          if (worldMap[byMap][bxMap] > 0) {  
-            side = SIDE_VER;
-            mapX = bxMap;
-            mapY = byMap;
-          }
-          globalRayPosX = bx;
-          globalRayPosY = by;
-          totalDist += pb;
-          textureX = by % TEXTURE_SIZE;
-        }
-        
-#ifdef DEBUG        
-        printf("\n-td=%d", totalDist);
-#endif        
-        
-        if (globalRayDirY <= 0) {
-          ay = (globalRayPosY & 0xF0) - 1;
-          ayMap = ay >> MAP_UNIT_POWER;
-        } else {
-          ay = (globalRayPosY & 0xF0) + MAP_UNIT_SIZE;
-          ayMap = ay >> MAP_UNIT_POWER;          
-        }
-        if (globalRayDirX <= 0) {
-          bx = (globalRayPosX & 0xF0) - 1;
-          bxMap = bx >> MAP_UNIT_POWER;
-          //xa = -xa;
-        } else {
-          bx = (globalRayPosX & 0xF0) + MAP_UNIT_SIZE;
-          bxMap = bx >> MAP_UNIT_POWER;          
-        }                
-      }
-#ifdef DEBUG
-      printf("\n*mx=%d,my=%d,s=%d,td=%d", mapX, mapY, side, totalDist);
-#endif      
-      correctDist = (totalDist * COS[localAngle]) >> MAP_UNIT_POWER;
       
-      
+      castRay(globalRayAngle, *correctDist, &side, &mapValue, &textureX);
 
       //Calculate height of line to draw on screen
       lineHeight = MAP_UNIT_SIZE*35 / correctDist;
@@ -452,7 +458,7 @@ int main (void) {
 
       //draw the pixels of the stripe as a vertical line     
 //#ifndef DEBUG      
-      mapValue = worldMap[mapY][mapX];
+      
       verLine(x, drawStart, drawEnd, side, textureX, textureScaleMap[drawEnd-drawStart], mapValue, backCharBufAddr, backColorBuf);
 //#else
 #ifdef DEBUG 
