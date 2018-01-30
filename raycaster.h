@@ -79,7 +79,7 @@ extern uint8_t textureScaleMap[];
 // This is used to point DDA which side of wall to choose. I.e. when we say
 // that SIDE_HOR is TOO_FAR, then DDA assumes intersection with SIDE_VER.
 // This has to be "far" enough not to confuse the algorithm.
-#define TOO_FAR 1024
+#define TOO_FAR 255
 
 // Visible and hidden sides of walls.
 // sidesMap[y][x] contains a 8-bit mask DDCCBBAA, where

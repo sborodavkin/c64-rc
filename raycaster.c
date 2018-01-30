@@ -49,40 +49,8 @@ uint8_t textureSquareColors[4] = {2, 8, 10, 7};
 uint8_t textureScaleMap[SCREEN_HEIGHT];
 uint8_t sidesMap[MAP_HEIGHT][MAP_WIDTH];
 uint8_t backColorBuf[1000];
-int8_t COS[NUM_ANGLES] = {32, 32, 32, 32, 32, 32, 32, 32, 31, 31, 31, 31, 31,
-    30, 30, 30, 30, 29, 29, 29, 28, 28, 27, 27, 27, 26, 26, 25, 25, 24, 24,
-    23, 23, 22, 21, 21, 20, 20, 19, 18, 18, 17, 16, 16, 15, 14, 14, 13,
-    12, 12, 11, 10, 9, 9, 8, 7, 6, 5, 5, 4, 3, 2, 2, 1, 0, -1, -2, -2,
-    -3, -4, -5, -5, -6, -7, -8, -9, -9, -10, -11, -12, -12, -13, -14,
-    -14, -15, -16, -16, -17, -18, -18, -19, -20, -20, -21, -21, -22,
-    -23, -23, -24, -24, -25, -25, -26, -26, -27, -27, -27, -28, -28,
-    -29, -29, -29, -30, -30, -30, -30, -31, -31, -31, -31, -31, -32,
-    -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32,
-    -32, -31, -31, -31, -31, -31, -30, -30, -30, -30, -29, -29, -29,
-    -28, -28, -27, -27, -27, -26, -26, -25, -25, -24, -24, -23, -23, 
-    -22, -21, -21, -20, -20, -19, -18, -18, -17, -16, -16, -15, -14,
-    -14, -13, -12, -12, -11, -10, -9, -9, -8, -7, -6, -5, -5, -4, -3,
-    -2, -2, -1, 0, 1, 2, 2, 3, 4, 5, 5, 6, 7, 8, 9, 9, 10, 11, 12, 12,
-    13, 14, 14, 15, 16, 16, 17, 18, 18, 19, 20, 20, 21, 21, 22, 23, 23,
-    24, 24, 25, 25, 26, 26, 27, 27, 27, 28, 28, 29, 29, 29, 30, 30, 30,
-    30, 31, 31, 31, 31, 31, 32, 32, 32, 32, 32, 32, 32};
-int8_t SIN[NUM_ANGLES] = {0, 1, 2, 2, 3, 4, 5, 5, 6, 7, 8, 9, 9, 10, 11, 12,
-    12, 13, 14, 14, 15, 16, 16, 17, 18, 18, 19, 20, 20, 21, 21, 22, 23, 23,
-    24, 24, 25, 25, 26, 26, 27, 27, 27, 28, 28, 29, 29, 29, 30, 30, 30,
-    30, 31, 31, 31, 31, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
-    32, 32, 32, 32, 31, 31, 31, 31, 31, 30, 30, 30, 30, 29, 29, 29, 28,
-    28, 27, 27, 27, 26, 26, 25, 25, 24, 24, 23, 23, 22, 21, 21, 20, 20,
-    19, 18, 18, 17, 16, 16, 15, 14, 14, 13, 12, 12, 11, 10, 9, 9, 8, 7,
-    6, 5, 5, 4, 3, 2, 2, 1, 0, -1, -2, -2, -3, -4, -5, -5, -6, -7, -8,
-    -9, -9, -10, -11, -12, -12, -13, -14, -14, -15, -16, -16, -17, -18,
-    -18, -19, -20, -20, -21, -21, -22, -23, -23, -24, -24, -25, -25,
-    -26, -26, -27, -27, -27, -28, -28, -29, -29, -29, -30, -30, -30,
-    -30, -31, -31, -31, -31, -31, -32, -32, -32, -32, -32, -32, -32,
-    -32, -32, -32, -32, -32, -32, -32, -32, -31, -31, -31, -31, -31,
-    -30, -30, -30, -30, -29, -29, -29, -28, -28, -27, -27, -27, -26,
-    -26, -25, -25, -24, -24, -23, -23, -22, -21, -21, -20, -20, -19,
-    -18, -18, -17, -16, -16, -15, -14, -14, -13, -12, -12, -11, -10,
-    -9, -9, -8, -7, -6, -5, -5, -4, -3, -2, -2, -1};
+int8_t COS[NUM_ANGLES] = {16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 15, 15, 15, 15, 15, 15, 15, 14, 14, 14, 14, 14, 14, 13, 13, 13, 13, 12, 12, 12, 12, 11, 11, 11, 10, 10, 10, 10, 9, 9, 9, 8, 8, 8, 7, 7, 6, 6, 6, 5, 5, 5, 4, 4, 4, 3, 3, 2, 2, 2, 1, 1, 0, 0, 0, -1, -1, -2, -2, -2, -3, -3, -4, -4, -4, -5, -5, -5, -6, -6, -6, -7, -7, -8, -8, -8, -9, -9, -9, -10, -10, -10, -10, -11, -11, -11, -12, -12, -12, -12, -13, -13, -13, -13, -14, -14, -14, -14, -14, -14, -15, -15, -15, -15, -15, -15, -15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -15, -15, -15, -15, -15, -15, -15, -14, -14, -14, -14, -14, -14, -13, -13, -13, -13, -12, -12, -12, -12, -11, -11, -11, -10, -10, -10, -10, -9, -9, -9, -8, -8, -8, -7, -7, -6, -6, -6, -5, -5, -5, -4, -4, -4, -3, -3, -2, -2, -2, -1, -1, 0, 0, 0, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 12, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16};
+int8_t SIN[NUM_ANGLES] = {0, 0, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 12, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 15, 15, 15, 15, 15, 15, 15, 14, 14, 14, 14, 14, 14, 13, 13, 13, 13, 12, 12, 12, 12, 11, 11, 11, 10, 10, 10, 10, 9, 9, 9, 8, 8, 8, 7, 7, 6, 6, 6, 5, 5, 5, 4, 4, 4, 3, 3, 2, 2, 2, 1, 1, 0, 0, 0, -1, -1, -2, -2, -2, -3, -3, -4, -4, -4, -5, -5, -5, -6, -6, -6, -7, -7, -8, -8, -8, -9, -9, -9, -10, -10, -10, -10, -11, -11, -11, -12, -12, -12, -12, -13, -13, -13, -13, -14, -14, -14, -14, -14, -14, -15, -15, -15, -15, -15, -15, -15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -15, -15, -15, -15, -15, -15, -15, -14, -14, -14, -14, -14, -14, -13, -13, -13, -13, -12, -12, -12, -12, -11, -11, -11, -10, -10, -10, -10, -9, -9, -9, -8, -8, -8, -7, -7, -6, -6, -6, -5, -5, -5, -4, -4, -4, -3, -3, -2, -2, -2, -1, -1, 0};
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -220,6 +188,25 @@ uint16_t distance(uint8_t angle, uint16_t ax, uint16_t ay, uint16_t bx, uint16_t
   }
 }
 
+void printPosInfo(uint8_t globalRayPosX, uint8_t globalRayPosY, uint8_t cameraAngle) {
+  uint16_t charBufAddr;
+  char res[32];
+  uint8_t i;
+  snprintf(res, sizeof(res), "(%u,%u),%u", globalRayPosX, globalRayPosY, cameraAngle);
+  if (backCharBufAddr == CHAR_BUF_0) {
+    charBufAddr = CHAR_BUF_1;
+  } else {
+    charBufAddr = CHAR_BUF_0;
+  }
+  for (i=0; i < strlen(res); i++) {
+    *(uint8_t*)(charBufAddr + i) = res[i];
+    *(uint8_t*)(0xd800 + i) = 0;
+    
+  }
+}
+
+#define DIFF(a, b) ((a > b) ? a - b : b - a)
+
 
 int main (void) {
   uint8_t pixToBrad; 
@@ -231,10 +218,10 @@ int main (void) {
   int8_t localAngle;
   uint8_t globalRayAngle;
   // Start global camera position.
-  int16_t posX = 14 * MAP_UNIT_SIZE + MAP_UNIT_SIZE/2,
-          posY = 1 * MAP_UNIT_SIZE + MAP_UNIT_SIZE/2;
+  uint8_t posX = 60, /*14 * MAP_UNIT_SIZE + MAP_UNIT_SIZE/2,*/
+          posY = 19; //1 * MAP_UNIT_SIZE + MAP_UNIT_SIZE/2;
   // Start global camera direction.
-  uint8_t cameraAngle = 128;
+  uint8_t cameraAngle = 239;
   uint8_t halfScreenWidth = SCREEN_WIDTH / 2;
   // Global position of current ray (=camera position).
   int16_t globalRayPosX, globalRayPosY;
@@ -248,13 +235,14 @@ int main (void) {
   // Input char
   char c;  
   // A is intersection with next horizontal line, B - with vertical line.
-  int16_t /*xa, ya,*/ ax, ay, bx, by;
+  uint8_t /*xa, ya,*/ ax, ay, bx, by;
   uint8_t axMap, ayMap, bxMap, byMap; // A and B in map coordinates.
-  int16_t pa, pb;
+  uint8_t pa, pb;  // TODO: artifacts
   uint16_t totalDist, correctDist;  
   uint8_t sidesMaskA, sidesMaskB;
   uint16_t newPosX, newPosY;  // Used for collision detection.
   uint8_t mapValue;
+  uint8_t axbyCalcHelper;
   
   printf("\n");
   printf("***************************************\n");
@@ -291,15 +279,15 @@ int main (void) {
       mapY = globalRayPosY >> MAP_UNIT_POWER;
    
       if (globalRayDirY <= 0) {
-        ay = (globalRayPosY & 0xFFF0) - 1;          
+        ay = (globalRayPosY & 0xF0) - 1;          
       } else {
         //printf("\nololo grpxandfff0=%d,plus=%d\n", (globalRayPosY & 0xFFF0), (globalRayPosY & 0xFFF0) + MAP_UNIT_SIZE);
-        ay = (globalRayPosY & 0xFFF0) + MAP_UNIT_SIZE;
+        ay = (globalRayPosY & 0xF0) + MAP_UNIT_SIZE;
       }
       if (globalRayDirX <= 0) {
-        bx = (globalRayPosX & 0xFFF0) - 1;
+        bx = (globalRayPosX & 0xF0) - 1;
       } else {
-        bx = (globalRayPosX & 0xFFF0) + MAP_UNIT_SIZE;
+        bx = (globalRayPosX & 0xF0) + MAP_UNIT_SIZE;
       }
       ayMap = ay >> MAP_UNIT_POWER;
       bxMap = bx >> MAP_UNIT_POWER;      
@@ -307,23 +295,50 @@ int main (void) {
       totalDist = 0;
 
       // Start DDA.
-      while (side == SIDE_UNDEF) {      
+      while (side == SIDE_UNDEF) {
+        pb = 0; pa = 0;      
 #ifdef DEBUG
         printf("\n-grpx=%d,grpy=%d", globalRayPosX, globalRayPosY);
 #endif        
-        // Not using TAN here to keep higher precision:
-        // E.g. ((2<<5)*28/15)>>5=3; with TAN, ((2<<5)*1)>>5=2.
-        ax = globalRayPosX + ((((globalRayPosY-ay) << MAP_UNIT_POWER) *
-          globalRayDirX / -globalRayDirY) >> MAP_UNIT_POWER);        
-        by = globalRayPosY + ((((globalRayPosX-bx) << MAP_UNIT_POWER) *
-          -globalRayDirY / globalRayDirX) >> MAP_UNIT_POWER);
-        axMap = ax >> MAP_UNIT_POWER;
-        byMap = by >> MAP_UNIT_POWER;
-        pa = distance(globalRayAngle, globalRayPosX, globalRayPosY, ax, ay);
-        pb = distance(globalRayAngle, globalRayPosX, globalRayPosY, bx, by);
+        if (abs(globalRayDirX) == 16 && abs(globalRayDirY) == 1) {
+          // (Nearly) horizontal ray, won't cross any SIDE_HOR.
+          ax = TOO_FAR;
+          pa = TOO_FAR;
+        } else {          
+          ax = DIFF(globalRayPosY, ay) * abs(globalRayDirX) / abs(-globalRayDirY);
+          if (globalRayDirX > 0) {
+            ax = globalRayPosX + ax;
+          } else {
+            if (ax > globalRayPosX) {
+              ax = TOO_FAR;
+              pa = TOO_FAR;
+            } else {
+              ax = globalRayPosX - ax;
+            }
+          }
+          axMap = ax >> MAP_UNIT_POWER;
+        }
+        if (abs(globalRayDirY) == 16 && abs(globalRayDirX) == 1) {
+          // (Nearly) vertical ray, won't cross any SIDE_VER.
+          by = TOO_FAR;
+          pb = TOO_FAR;
+        } else {          
+          by = DIFF(globalRayPosX, bx) * abs(-globalRayDirY) / abs(globalRayDirX);
+          if (globalRayDirY > 0) {
+            by = globalRayPosY + by;
+          } else {
+            if (by > globalRayPosY) {
+              by = TOO_FAR;
+              pb = TOO_FAR;
+            } else {
+              by = globalRayPosY - by;
+            }
+          }
+          byMap = by >> MAP_UNIT_POWER;       
+        }        
+        if (!pa) pa = distance(globalRayAngle, globalRayPosX, globalRayPosY, ax, ay);
+        if (!pb) pb = distance(globalRayAngle, globalRayPosX, globalRayPosY, bx, by);
         // Handle perpendiculars where overflow happens.
-        if (pa < 0) pa = TOO_FAR;
-        if (pb < 0) pb = TOO_FAR;
         if (abs(pa-pb) <= 5) {
           // Precision problem. Check actual sides visibility.
           sidesMaskA = sidesMap[ayMap][axMap];
@@ -374,18 +389,18 @@ int main (void) {
 #endif        
         
         if (globalRayDirY <= 0) {
-          ay = (globalRayPosY & 0xFFF0) - 1;
+          ay = (globalRayPosY & 0xF0) - 1;
           ayMap = ay >> MAP_UNIT_POWER;
         } else {
-          ay = (globalRayPosY & 0xFFF0) + MAP_UNIT_SIZE;
+          ay = (globalRayPosY & 0xF0) + MAP_UNIT_SIZE;
           ayMap = ay >> MAP_UNIT_POWER;          
         }
         if (globalRayDirX <= 0) {
-          bx = (globalRayPosX & 0xFFF0) - 1;
+          bx = (globalRayPosX & 0xF0) - 1;
           bxMap = bx >> MAP_UNIT_POWER;
           //xa = -xa;
         } else {
-          bx = (globalRayPosX & 0xFFF0) + MAP_UNIT_SIZE;
+          bx = (globalRayPosX & 0xF0) + MAP_UNIT_SIZE;
           bxMap = bx >> MAP_UNIT_POWER;          
         }                
       }
@@ -424,6 +439,7 @@ int main (void) {
     
 #ifndef DEBUG
     flushFrame();
+    printPosInfo(posX, posY, cameraAngle);
     
     cbm_k_chkin (0);
     c = cbm_k_getin();
@@ -433,15 +449,15 @@ int main (void) {
       } else if (c == 'a') {
         cameraAngle = normalizeAngle((int16_t)(cameraAngle + 4));
       } else if (c == 'w') {
-        newPosX = posX + (COS[cameraAngle] >> 4);
-        newPosY = posY + (-SIN[cameraAngle] >> 4);
+        newPosX = posX + (COS[cameraAngle] >> 3);
+        newPosY = posY + (-SIN[cameraAngle] >> 3);
         if (1) { //(worldMap[newPosY>>5][newPosX>>5] == 0) {
           posX = newPosX;
           posY = newPosY;
         }
       } else if (c == 's') {
-        newPosX = posX - (COS[cameraAngle] >> 4);
-        newPosY = posY - (-SIN[cameraAngle] >> 4);
+        newPosX = posX - (COS[cameraAngle] >> 3);
+        newPosY = posY - (-SIN[cameraAngle] >> 3);
         if (1) { //(worldMap[newPosY>>5][newPosX>>5] == 0) {
           posX = newPosX;
           posY = newPosY;
