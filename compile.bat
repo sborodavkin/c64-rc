@@ -1,4 +1,15 @@
 @echo off
-cl65 -t c64 rc.c
+
+cc65 -Oirs -T render.c
+ca65 render.s
+
+cc65 -Oirs -T math.c
+ca65 math.s
+
+cc65 -t c64 -T raycaster.c
+ca65 raycaster.s
+
+ld65 -t c64 -o rc raycaster.o math.o render.o c64.lib
+
 del rc.d64
-c1541 -format "rc,1" d64 rc.d64 -attach rc.d64 -write rc rc
+c:\winvice-3.1-x64\c1541 -format "rc,1" d64 rc.d64 -attach rc.d64 -write rc rc

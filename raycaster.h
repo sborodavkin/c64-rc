@@ -136,10 +136,6 @@ void compileMapSides();
 // Flushes back- and color-buffer to video RAM.
 void flushBuffer();
 
-// Helper to calculate a distance between two points on a ray with given angle.
-uint8_t distance(uint8_t absCos, uint8_t absSin, uint8_t ax, uint8_t ay,
-                 uint8_t bx, uint8_t by);
-
 /* Prints the info line.
  *
  * Args:
@@ -148,7 +144,7 @@ uint8_t distance(uint8_t absCos, uint8_t absSin, uint8_t ax, uint8_t ay,
  *   angle: global camera angle.
  *   clkFps: clock_t ticks per frame.
  */
-extern void printInfo(uint8_t posX, uint8_t posY, uint8_t angle,
-                      uint16_t clkFps);
+void printInfo(uint8_t posX, uint8_t posY, uint8_t angle,
+               uint16_t clkFps);
 
 #endif
