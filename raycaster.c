@@ -18,38 +18,18 @@
 #include "raycaster.h"
 #include "render.h"
 #include "math.h"
+#include "world.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Definitions.
 ////////////////////////////////////////////////////////////////////////////////
 
-uint8_t worldMap[MAP_HEIGHT][MAP_WIDTH] =
-{
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,2,2,2,0,2,2,2,0,2,2,2,2,2,2},
-  {1,1,2,0,0,0,0,0,2,0,0,0,0,0,0,2},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
-  {1,0,2,0,0,0,0,0,2,0,0,0,0,0,0,2},
-  {1,1,2,2,2,0,2,2,2,2,2,0,0,2,2,2},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-};
-
 uint8_t textureBrick[TEXTURE_SIZE*TEXTURE_SIZE];
 uint8_t textureBrickColors[4] = {5, 12, 13, 15};
 uint8_t textureSquare[TEXTURE_SIZE*TEXTURE_SIZE];
 uint8_t textureSquareColors[4] = {2, 8, 10, 7};
 uint8_t textureScaleMap[SCREEN_HEIGHT];
-uint8_t sidesMap[MAP_HEIGHT][MAP_WIDTH];
 uint8_t backColorBuf[1000];
 int8_t COS[NUM_ANGLES] = {16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 15,
     15, 15, 15, 15, 15, 15, 14, 14, 14, 14, 14, 14, 13, 13, 13, 13, 12, 12, 12,
@@ -122,28 +102,6 @@ void initTextureScaleMap() {
   }
 }
 
-void compileMapSides() {
-  uint8_t x, y, sidesMask;
-  for (y = 0; y < MAP_HEIGHT; y++) {
-    for (x = 0; x < MAP_WIDTH; x++) {    
-      sidesMask = 0xFF;
-      if (y == 0 || worldMap[y-1][x] > 0) {
-        sidesMask &= 0XFC;
-      }
-      if (x == MAP_WIDTH - 1 || worldMap[y][x+1] > 0) {
-        sidesMask &= 0xF3;
-      }
-      if (y == MAP_HEIGHT - 1 || worldMap[y+1][x] > 0) {
-        sidesMask &= 0xCF;
-      }
-      if (x == 0 || worldMap[y][x-1] > 0) {
-        sidesMask &= 0x3F;
-      }
-      sidesMap[y][x] = sidesMask;
-    }
-  }
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Helpers
 ////////////////////////////////////////////////////////////////////////////////
@@ -193,10 +151,10 @@ int main (void) {
   uint8_t globalRayAngle;
   uint8_t pixToBrad = FOV / SCREEN_WIDTH; 
   // Start global camera position.
-  uint8_t posX = 14 * MAP_UNIT_SIZE + MAP_UNIT_SIZE/2,
-          posY = 1 * MAP_UNIT_SIZE + MAP_UNIT_SIZE/2;
+  uint8_t posX = 2 * MAP_UNIT_SIZE + MAP_UNIT_SIZE/2,
+          posY = 2 * MAP_UNIT_SIZE + MAP_UNIT_SIZE/2;
   // Start global camera direction.
-  uint8_t cameraAngle = 127;
+  uint8_t cameraAngle = 224;
   uint8_t halfScreenWidth = SCREEN_WIDTH / 2;
 
   // Whether we have hit the wall, and from which side (0 = hor, 1 = vert)
@@ -204,14 +162,12 @@ int main (void) {
   uint8_t drawStart, drawEnd, textureX;
   // Input char
   char c;  
-  uint8_t correctDist;  
+  uint16_t correctDist;  
   uint8_t newPosX, newPosY;  // Used for collision detection.
-  uint8_t mapValue;
+  uint8_t wallTexture;
   clock_t fpsStart, fpsEnd;
   
   printIntro();
-  printf("Compiling map sides...\n");
-  compileMapSides();
   printf("Init textures...\n");
   initTextures();
   printf("Init texture scale map...\n");
@@ -225,21 +181,22 @@ int main (void) {
       localAngle = x * pixToBrad - halfScreenWidth;
       globalRayAngle = cameraAngle - localAngle;
       
-      castRay(posX, posY, globalRayAngle, localAngle, &correctDist,
-          &side, &mapValue, &textureX);
-      getWallSlice(correctDist, &drawStart, &drawEnd);
-      verLine(x, drawStart, drawEnd, side, textureX,
-          textureScaleMap[drawEnd-drawStart], mapValue, backCharBufAddr,
-          backColorBuf);
-
-#ifdef DEBUG 
-      printf("\n-cd=%d,lh=%d,ds=%d,de=%d,tx=%d", correctDist, lineHeight, drawStart, drawEnd, textureX);      
-      cbm_k_chkin (0);
-      c = cbm_k_getin();
-      while (!c) {
-        cbm_k_chkin (0);
-        c = cbm_k_getin();
+      if (castRay(posX, posY, globalRayAngle, localAngle, &correctDist,
+          &side, &wallTexture, &textureX) == 1) {
+        //printf("nocast");
+        //waitForKey();
+        //return 1;
       }
+      //correctDist = (correctDist * COS[localAngle]) >> 4;
+      getWallSlice(correctDist, &drawStart, &drawEnd);
+#ifdef DEBUG      
+      waitForKey();
+#endif      
+      verLine(x, drawStart, drawEnd, side, textureX,
+          textureScaleMap[drawEnd-drawStart], wallTexture, backCharBufAddr,
+          backColorBuf);
+#ifdef DEBUG
+      waitForKey();
 #endif      
     }
     

@@ -30,9 +30,6 @@
 // should be changed to 5 and so on.
 #define MAP_UNIT_POWER 4
 
-// World map as 2D array. 0 is empty square, >0 are different wall types.
-extern uint8_t worldMap[][MAP_WIDTH];
-
 // Screen resolution we operate in.
 #define SCREEN_WIDTH 40
 #define SCREEN_HEIGHT 25
@@ -84,19 +81,6 @@ extern uint8_t textureScaleMap[];
 // This has to be "far" enough not to confuse the algorithm.
 #define TOO_FAR 255
 
-// Visible and hidden sides of walls.
-// sidesMap[y][x] contains a 8-bit mask DDCCBBAA, where
-// AA = 00 if northern side of wall is hidden,
-// BB = 00 if eastern side of wall is hidden,
-// CC = 00 if southern side of wall is hidden,
-// DD = 00 if western side of wall is hidden.
-// For visible sides, 11 is stored.
-// Example: for wall marked with "*" here we store 00110011 = 0x33.
-// 111
-// 0*0
-// 111
-extern uint8_t sidesMap[][MAP_WIDTH];
-
 ////////////////////////////////////////////////////////////////////////////////
 // Double buffering.
 ////////////////////////////////////////////////////////////////////////////////
@@ -129,9 +113,6 @@ uint8_t waitForKey();
 
 // Init textures data.
 void initTextures();
-
-// Init wall sides map for the world map.
-void compileMapSides();
 
 // Flushes back- and color-buffer to video RAM.
 void flushBuffer();

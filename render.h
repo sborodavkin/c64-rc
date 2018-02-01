@@ -30,17 +30,17 @@ extern uint16_t backCharBufAddr;
  *   side: either SIDE_HOR or SIDE_VER - which side of the wall the ray crossed.
  *   textureX: X-coordinate of texel.
  *   scale: texture scale factor for given wall slice height.
- *   mapValue: worldMap value at position being drawn.
+ *   wallTexture: texture type at position being drawn.
  *   backCharBufAddr: character buffer address.
  *   backColorBufAddr: color RAM back buffer address.
  */ 
 void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side,
-             uint8_t textureX, uint8_t scale, uint8_t mapValue,
+             uint8_t textureX, uint8_t scale, uint8_t wallTexture,
              uint16_t backCharBufAddr, uint16_t backColorBufAddr);
 
 /* Gets color of a specific Y-offset of a wall slice.
  * Args:
- *   mapValue: worldMap value at position being drawn.
+ *   wallTexture: texture type at position being drawn.
  *   side: either SIDE_HOR or SIDE_VER - which side of the wall the ray crossed.
  *   numTexelColsRendered: number of texel columns rendered so far.
  *                         For example, if so far we have drawn:
@@ -54,7 +54,7 @@ void verLine(uint8_t x, uint8_t start, uint8_t end, uint8_t side,
  *   textureY: Y-coordinate of texel that we need to draw (in the example above
  *             it is 3).
  */               
-uint8_t getColor(uint8_t mapValue, uint8_t side,
+uint8_t getColor(uint8_t wallTexture, uint8_t side,
                  uint8_t numTexelColsRendered, uint8_t textureY);
                         
 /* Makes back char buffer visible and copies the back color buffer to color RAM.
