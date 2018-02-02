@@ -101,6 +101,10 @@ extern int8_t COS[];
 // Sin table, 0-255 => -16..16
 extern int8_t SIN[];
 
+extern int16_t USTAR_COS[];
+extern int16_t USTAR_SIN[];
+#define USTAR_SCALE 7
+
 ////////////////////////////////////////////////////////////////////////////////
 // Functions.
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,6 +117,9 @@ uint8_t waitForKey();
 
 // Init textures data.
 void initTextures();
+
+// Init U*.
+void initUStar();
 
 // Flushes back- and color-buffer to video RAM.
 void flushBuffer();

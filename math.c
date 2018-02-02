@@ -17,83 +17,94 @@
 
 #define POINT_IN_RANGE_AND_INCREMENT(p, c1, c2) ((p++ - c1) < (c2-c1))
 
-uint8_t getRayToLineSegmentIntersection(uint8_t posX, uint8_t posY,
+uint16_t getRayToLineSegmentIntersection(uint8_t posX, uint8_t posY, uint8_t angle,
     int8_t globalRayDirX, int8_t globalRayDirY,
     uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint16_t* intersectionPointOnWall)
 {
   uint8_t minWallCoord, maxWallCoord;  
-  int16_t t, intersection;
+  // tStar multitude is map dimension * 2^USTAR_SCALE, e.g. 256 * 128.
+  // Experiments show that USTAR_SCALE=7 gives no overflow while at 8 there's
+  // already some. TODO: if there are no large open scenes this might still be
+  // fine.
+  int16_t tStar, uStar, h;
+  int16_t cox, coy;
+  uint16_t iX, iY;
 
   if (x1 == x2) { 
     // Vertical line.
-    if (globalRayDirX == 0) {
-      // Ray parallel to wall, no intersection.
-      *intersectionPointOnWall = 0;
-      return 0;
+    if (abs(globalRayDirY) != 32) {
+      uStar = USTAR_COS[angle];
+      cox = (int16_t)x1 - (int16_t)posX;
+      tStar = cox * uStar;
+#ifdef DEBUG
+      printf("\r\n-us=%D,cox=%D,ts=%D",uStar,cox,tStar);
+#endif      
+      if (tStar > 0) {
+        h = posY + tStar * globalRayDirY;
+        h = h / (1 << USTAR_SCALE);
+        iY = (uint16_t)(posY + h);
+#ifdef DEBUG
+        printf(",h=%D,iy=%D",h,iY);
+#endif              
+        if (y1 < y2) {
+          minWallCoord = y1;
+          maxWallCoord = y2;
+        } else {
+          minWallCoord = y2;
+          maxWallCoord = y1;
+        }
+        if POINT_IN_RANGE_AND_INCREMENT(iY, minWallCoord, maxWallCoord) {
+          *intersectionPointOnWall = --iY;
+          return distance(angle, posX, posY, x1, iY);
+        }
+      }
     }
-    t = (int16_t)(x1 - posX) / globalRayDirX;
-    if (t < 0) {
-      // Different signs, no intersection.
-      *intersectionPointOnWall = 0;
-      return 0;
-    }
-    if (y1 < y2) {
-      minWallCoord = y1;
-      maxWallCoord = y2;
-    } else {
-      minWallCoord = y2;
-      maxWallCoord = y1;
-    }
-    // Check if other coord is within line segment.
-    intersection = (int16_t)posY + (t * globalRayDirY);
-    if (POINT_IN_RANGE_AND_INCREMENT(intersection, minWallCoord, maxWallCoord)) {
-      *intersectionPointOnWall = intersection;
-      return t;
-    }
+    *intersectionPointOnWall = 0;
+    return 0;
   } else {
     // Horizontal line.
-    if (globalRayDirY == 0) {
-      // Ray parallel to wall, no intersection.
-      *intersectionPointOnWall = 0;
-      return 0;
+    if (abs(globalRayDirX) != 32) {
+      uStar = USTAR_SIN[angle];
+      coy = (int16_t)y1 - (int16_t)posY;
+      tStar = coy * uStar;
+#ifdef DEBUG
+      printf("\r\n-us=%D,coy=%D,ts=%D",uStar,coy,tStar);
+#endif
+      if (tStar > 0) {
+        h = posX + tStar * globalRayDirX;
+        h = h / (1 << USTAR_SCALE);
+        iX = (uint16_t)(posX + h);
+#ifdef DEBUG
+        printf(",h=%D,ix=%D",h,iX);
+#endif
+        if (x1 < x2) {
+          minWallCoord = x1;
+          maxWallCoord = x2;
+        } else {
+          minWallCoord = x2;
+          maxWallCoord = x1;
+        }
+        if POINT_IN_RANGE_AND_INCREMENT(iX, minWallCoord, maxWallCoord) {
+          *intersectionPointOnWall = --iX;
+          return distance(angle, posX, posY, iX, y1);
+        }
+      }
     }
-    t = (int16_t)(y1 - posY) / globalRayDirY;
-    if (t < 0) {
-      // Different signs, no intersection.
-      *intersectionPointOnWall = 0;
-      return 0;
-    }
-    if (x1 < x2) {
-      minWallCoord = x1;
-      maxWallCoord = x2;
-    } else {
-      minWallCoord = x2;
-      maxWallCoord = x1;
-    }
-    // Check if other coord is within line segment.
-    intersection = (int16_t)posX + (t * globalRayDirX);
-    if (POINT_IN_RANGE_AND_INCREMENT(intersection, minWallCoord, maxWallCoord)) {
-      *intersectionPointOnWall = intersection;
-      return t;
-    }
-  }
+    *intersectionPointOnWall = 0;
+    return 0;  
+  }    
 }
 
 
-uint16_t correctDist(int16_t rayDist, uint8_t angle, int16_t rayDirX, int16_t rayDirY) {
-  uint16_t distX = abs(rayDirX*rayDist), distY = abs(rayDirY*rayDist);
+// Helper to calculate a distance between two points on a ray with given angle.
+uint16_t distance(uint8_t angle, uint16_t ax, uint16_t ay, uint16_t bx, uint16_t by) {
+  uint16_t distX = abs(ax-bx), distY = abs(ay-by);
   if (distX > distY) {
     // X is more distinct, use cos.v
-#ifdef DEBUG
-    printf("\r\nxdiv %D by %D", (distX << 4), abs((int16_t)COS[angle]));
-#endif      
-    return (distX << 4) / abs((int16_t)COS[angle]);
+    return (distX << 5) / abs(COS[angle]);
   } else {
-#ifdef DEBUG
-    printf("\r\nydiv %D by %D", (distY << 4), abs((int16_t)SIN[angle]));
-#endif  
     // Y is more distinct, use sin.
-    return (distY << 4) / abs((int16_t)SIN[angle]);
+    return (distY << 5) / abs(SIN[angle]);
   }
 }
 
@@ -122,7 +133,7 @@ uint16_t castRay(uint8_t posX, uint8_t posY, uint8_t globalRayAngle,
     w1Y = worlds[CUR_WORLD][wallIt+1] << MAP_UNIT_POWER;
     w2X = worlds[CUR_WORLD][wallIt+2] << MAP_UNIT_POWER;
     w2Y = worlds[CUR_WORLD][wallIt+3] << MAP_UNIT_POWER;
-    rayDist = getRayToLineSegmentIntersection(posX, posY, globalRayDirX,
+    rayDist = getRayToLineSegmentIntersection(posX, posY, globalRayAngle, globalRayDirX,
         globalRayDirY, w1X, w1Y, w2X, w2Y, &intWall);
 #ifdef DEBUG
     printf("\r\n(%D,%D)-(%D,%D): %D", w1X, w1Y, w2X, w2Y,rayDist);
@@ -130,13 +141,13 @@ uint16_t castRay(uint8_t posX, uint8_t posY, uint8_t globalRayAngle,
     if (rayDist > 0) {
       found = 1;
       if (w1X == w2X) {
-        angle = globalRayAngle;
+        angle = 0x40 - globalRayAngle;
         sides[CUR_WORLD][wallIt/2] = SIDE_VER;
       } else {
         angle = globalRayAngle;
         sides[CUR_WORLD][wallIt/2] = SIDE_HOR;        
       }
-      wallDist[CUR_WORLD][wallIt/2] = correctDist(rayDist, angle, globalRayDirX, globalRayDirY);
+      wallDist[CUR_WORLD][wallIt/2] = rayDist;
       intersection[CUR_WORLD][wallIt/2] = intWall;
 
 #ifdef DEBUG

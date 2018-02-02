@@ -32,5 +32,8 @@ void getWallSlice(uint8_t correctDist, uint8_t* drawStart, uint8_t* drawEnd);
 void getAyBx(uint8_t globalRayPosX, uint8_t globalRayPosY,
              int8_t globalRayDirX, int8_t globalRayDirY,
              uint8_t* ay, uint8_t* bx);
+             
+uint16_t distance(uint8_t angle, uint16_t ax, uint16_t ay, uint16_t bx,
+                  uint16_t by);
 
 #endif
